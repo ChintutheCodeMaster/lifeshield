@@ -53,7 +53,7 @@ export function Hero() {
             <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl bg-mint-200/40">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://images.unsplash.com/photo-1591616455185-9c625b4a1ff8?w=900&q=80&auto=format&fit=crop"
+                src="/family.png"
                 alt="Family together outdoors"
                 className="h-full w-full object-cover"
               />
