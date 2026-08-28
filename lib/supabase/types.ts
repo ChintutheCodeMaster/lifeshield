@@ -2,6 +2,7 @@ export type LeadRow = {
   id: string;
   session_id: string;
   motivation: string[] | null;
+  quotes_for: string | null;
   who_to_protect: string[] | null;
   children_count: number | null;
   state: string | null;

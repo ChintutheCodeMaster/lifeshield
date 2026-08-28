@@ -17,14 +17,16 @@ export function StepShell({
 }) {
   return (
     <div className="min-h-screen flex flex-col bg-cream">
-      <ProgressBar value={progress} />
-      <header className="px-6 md:px-10 py-5 flex items-center justify-between">
-        <Link href="/" className="flex items-baseline gap-1">
-          <span className="text-2xl font-display font-bold text-mint-800">Mint</span>
-          <span className="text-2xl font-display font-light text-mint-500">Life</span>
-        </Link>
-        <div className="text-xs font-medium text-ink-500">
-          Step {index + 1} of {total}
+      <header className="px-6 md:px-10 pt-6 pb-4">
+        <div className="flex items-center gap-4 md:gap-8">
+          <Link href="/" className="flex items-baseline gap-1 shrink-0">
+            <span className="text-2xl font-display font-bold text-mint-800">Mint</span>
+            <span className="text-2xl font-display font-light text-mint-500">Life</span>
+          </Link>
+          <ProgressBar value={progress} className="flex-1 max-w-xl mx-auto" />
+          <div className="hidden sm:block text-xs font-medium text-ink-500 shrink-0 tabular-nums">
+            Step {index + 1} of {total}
+          </div>
         </div>
       </header>
       <main className="flex-1 flex items-start md:items-center justify-center px-6 pb-16">

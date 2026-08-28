@@ -16,6 +16,7 @@ type LeadRow = {
   term_length?: number | null;
   coverage_amount?: number | null;
   motivation?: string[] | null;
+  quotes_for?: string | null;
   who_to_protect?: string[] | null;
   children_count?: number | null;
   consent_at?: string | null;
@@ -44,6 +45,7 @@ export async function notifyLead(lead: LeadRow) {
     ["Term (years)", lead.term_length],
     ["Coverage", lead.coverage_amount ? `$${Number(lead.coverage_amount).toLocaleString()}` : null],
     ["Motivation", lead.motivation?.join(", ")],
+    ["Quotes for", lead.quotes_for],
     ["Protect", lead.who_to_protect?.join(", ")],
     ["Kids under 18", lead.children_count],
     ["Consent at", lead.consent_at],

@@ -5,6 +5,7 @@ const arrayCoerce = (v: unknown) => (Array.isArray(v) ? v : v == null ? undefine
 export const leadPatchSchema = z
   .object({
     motivation: z.preprocess(arrayCoerce, z.array(z.string()).optional()),
+    quotes_for: z.string().nullable().optional(),
     who_to_protect: z.preprocess(arrayCoerce, z.array(z.string()).optional()),
     children_count: z.coerce.number().int().min(0).max(20).optional(),
     state: z.string().optional(),

@@ -9,7 +9,7 @@ const COLUMNS = [
   "first_name","last_name","email","phone",
   "state","dob","sex_at_birth","tobacco","health_level",
   "term_length","coverage_amount",
-  "motivation","who_to_protect","children_count",
+  "motivation","quotes_for","who_to_protect","children_count",
 ] as const;
 
 function esc(v: unknown) {

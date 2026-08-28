@@ -61,6 +61,22 @@ export const steps: Step[] = [
       { value: "income", label: "Replace my income", icon: "dollar" },
       { value: "other", label: "Other", icon: "brain" },
     ],
+    next: "/quote/quotes-for",
+  },
+  {
+    id: "quotes-for",
+    path: "quotes-for",
+    title: "I'd like quotes for…",
+    subtitle: "Optional — helps us tailor your options.",
+    field: "quotes_for",
+    type: "single-buttons",
+    optional: true,
+    options: [
+      { value: "self", label: "Just me" },
+      { value: "self_and_spouse", label: "Me and my spouse or partner" },
+      { value: "self_and_family", label: "Me and my family" },
+      { value: "spouse", label: "Just my spouse or partner" },
+    ],
     next: "/quote/protect",
   },
   {

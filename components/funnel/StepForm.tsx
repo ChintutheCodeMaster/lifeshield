@@ -129,9 +129,30 @@ export function StepForm({ step }: Props) {
 
       <OkButton
         label={step.type === "interstitial" ? "Continue" : "OK"}
-        disabled={!canSubmit}
+        disabled={!canSubmit && !step.optional}
         loading={pending}
       />
+      {step.optional && (
+        <button
+          type="button"
+          onClick={() => {
+            if (pending) return;
+            startTransition(async () => {
+              if (step.field) {
+                await fetch("/api/leads", {
+                  method: "POST",
+                  headers: { "content-type": "application/json" },
+                  body: JSON.stringify({ patch: { [step.field]: null } }),
+                });
+              }
+              router.push(step.next);
+            });
+          }}
+          className="mt-3 text-sm text-ink-500 hover:text-mint-700 underline underline-offset-2 transition-colors"
+        >
+          Skip this question
+        </button>
+      )}
     </form>
   );
 }
