@@ -49,6 +49,7 @@ create table if not exists public.admin_users (
   created_at timestamptz not null default now()
 );
 alter table public.admin_users enable row level security;
-create policy if not exists admin_users_self_read
+drop policy if exists admin_users_self_read on public.admin_users;
+create policy admin_users_self_read
   on public.admin_users for select
   using (auth.uid() = user_id);
