@@ -4,8 +4,8 @@ import { ConsentF2 } from "./ConsentF2";
 export default function QuoteF2Complete() {
   return (
     <ShellF2>
-      <div className="rounded-md bg-white shadow-md px-6 md:px-8 py-8 animate-fade-in">
-        <h2 className="text-lg font-semibold text-ink-900">
+      <div className="rounded-3xl bg-white border border-mint-100 shadow-[0_20px_60px_-24px_rgba(31,93,66,0.25)] px-6 md:px-10 py-8 animate-fade-in">
+        <h2 className="font-display text-xl md:text-2xl font-semibold text-ink-900">
           Thanks — we&apos;re preparing your quotes.
         </h2>
         <p className="mt-3 text-sm text-ink-500 leading-relaxed">

@@ -27,11 +27,11 @@ export function ResultsF2() {
 
   if (!ready) {
     return (
-      <div className="rounded-md bg-white shadow-md p-12 text-center">
+      <div className="rounded-3xl bg-white border border-mint-100 shadow-[0_20px_60px_-24px_rgba(31,93,66,0.25)] p-12 text-center">
         <div className="inline-flex items-center gap-2">
-          <span className="h-3 w-3 rounded-full bg-[#2563eb] animate-pulse" />
-          <span className="h-3 w-3 rounded-full bg-[#2563eb] animate-pulse [animation-delay:120ms]" />
-          <span className="h-3 w-3 rounded-full bg-[#2563eb] animate-pulse [animation-delay:240ms]" />
+          <span className="h-3 w-3 rounded-full bg-mint-500 animate-pulse" />
+          <span className="h-3 w-3 rounded-full bg-mint-500 animate-pulse [animation-delay:120ms]" />
+          <span className="h-3 w-3 rounded-full bg-mint-500 animate-pulse [animation-delay:240ms]" />
         </div>
         <div className="mt-4 text-sm text-ink-500">Building your quotes…</div>
       </div>
@@ -39,35 +39,36 @@ export function ResultsF2() {
   }
 
   return (
-    <div className="rounded-md bg-white shadow-md px-6 md:px-8 py-8 animate-fade-in">
-      <h2 className="text-lg md:text-xl font-semibold text-ink-900">
+    <div className="rounded-3xl bg-white border border-mint-100 shadow-[0_20px_60px_-24px_rgba(31,93,66,0.25)] px-6 md:px-10 py-8 animate-fade-in">
+      <h2 className="font-display text-xl md:text-2xl font-semibold text-ink-900">
         {firstName ? `${firstName}, here are` : "Here are"} your quotes
       </h2>
       <p className="mt-1 text-sm text-ink-500">
         {term}-year term · up to {money(coverage)} coverage
       </p>
-      <p className="mt-3 text-xs text-ink-500">
+      <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-mint-100 text-mint-800 text-xs font-medium px-3 py-1.5">
         A licensed agent will call {phone ? `you at ${phone}` : brand.phone} shortly.
       </p>
 
-      <div className="mt-6 divide-y divide-ink-300/40">
+      <div className="mt-6 divide-y divide-mint-100">
         {quotes.map((q, i) => (
-          <div
-            key={q.name}
-            className="py-4 flex items-center justify-between gap-4"
-          >
+          <div key={q.name} className="py-4 flex items-center justify-between gap-4">
             <div>
               <div className="text-sm font-semibold text-ink-900">{q.name}</div>
-              <div className="text-xs text-ink-500 uppercase tracking-wider">
+              <div className="text-[10px] text-mint-700 uppercase tracking-widest font-semibold">
                 {i === 1 ? "Recommended" : q.tag}
               </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <div className="text-xl font-bold text-ink-900">{money(q.price)}</div>
-                <div className="text-[10px] text-ink-500 uppercase">per month</div>
+                <div className="text-xl font-bold text-ink-900 tabular-nums">
+                  {money(q.price)}
+                </div>
+                <div className="text-[10px] text-ink-500 uppercase tracking-wider">
+                  per month
+                </div>
               </div>
-              <button className="rounded-sm bg-[#2563eb] hover:bg-[#1d4fd8] text-white text-xs font-semibold uppercase tracking-wider px-4 py-2">
+              <button className="rounded-full bg-mint-500 hover:bg-mint-600 text-white text-xs font-semibold uppercase tracking-wider px-4 py-2 transition-colors">
                 Apply
               </button>
             </div>
