@@ -43,18 +43,30 @@ function isDobValue(v: unknown): v is DobValue {
 const MIN_AGE = 18;
 const MAX_AGE = 100;
 
-function isDobPlausible(m: number, d: number, y: number): boolean {
-  if (!(m >= 1 && m <= 12 && d >= 1 && d <= 31)) return false;
-  const now = new Date();
-  const dob = new Date(y, m - 1, d);
-  if (dob.getFullYear() !== y || dob.getMonth() !== m - 1 || dob.getDate() !== d) {
-    return false; // rejects things like Feb 30
-  }
+function ageAt(m: number, d: number, y: number, now = new Date()): number {
   let age = now.getFullYear() - y;
   const beforeBirthday =
     now.getMonth() < m - 1 || (now.getMonth() === m - 1 && now.getDate() < d);
   if (beforeBirthday) age -= 1;
-  return age >= MIN_AGE && age <= MAX_AGE;
+  return age;
+}
+
+function isDobPlausible(m: number, d: number, y: number): boolean {
+  return dobErrorMessage(m, d, y) === null;
+}
+
+// Returns a user-facing error string, or null when the date is acceptable.
+function dobErrorMessage(m: number, d: number, y: number): string | null {
+  if (!(m >= 1 && m <= 12)) return "Please enter a valid month (1–12).";
+  if (!(d >= 1 && d <= 31)) return "Please enter a valid day.";
+  const dt = new Date(y, m - 1, d);
+  if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) {
+    return "That date doesn't exist. Please double-check.";
+  }
+  const age = ageAt(m, d, y);
+  if (age < MIN_AGE) return `You must be at least ${MIN_AGE} to get a quote.`;
+  if (age > MAX_AGE) return "Please double-check the year.";
+  return null;
 }
 
 function fieldValid(field: GroupField, value: unknown): boolean {
@@ -171,16 +183,19 @@ export function StepForm({ step }: Props) {
     }
   }
 
-  // Enter should progress the form even when focus is on a custom option button
-  // (tiles / stacked buttons) or a native <select>, where the browser wouldn't
-  // otherwise fire form submit.
+  // Enter should progress the form from anywhere on the page — including custom
+  // option buttons (tiles/stacked buttons), where a focused button would
+  // otherwise treat Enter as another click and toggle the selection back off.
   function onFormKeyDown(e: React.KeyboardEvent<HTMLFormElement>) {
     if (e.key !== "Enter" || e.shiftKey) return;
     const t = e.target as HTMLElement;
     if (t.tagName === "TEXTAREA") return; // preserve newlines in textareas
-    if (t.tagName === "BUTTON") return;   // buttons already handle Enter themselves
-    if (!canSubmit || pending) return;
+    // If focus is on the real submit button, let the browser fire submit natively.
+    if (t.tagName === "BUTTON" && (t as HTMLButtonElement).type === "submit") return;
+    // Stop the default (button re-click / select toggle / newline insert) whether
+    // or not we can submit — otherwise Enter on a tile would un-toggle it.
     e.preventDefault();
+    if (!canSubmit || pending) return;
     onFormSubmit(e);
   }
 
@@ -432,37 +447,47 @@ function DobField({
     if (digits.length === max && next?.current) next.current.focus();
   }
 
+  // Only surface a validation message once the user has typed a full 4-digit
+  // year — before that they're still mid-entry and errors would flash.
+  const showError = value.y.length === 4 && value.m.length > 0 && value.d.length > 0;
+  const errorMsg = showError ? dobErrorMessage(+value.m, +value.d, +value.y) : null;
+
   return (
-    <div className="flex items-end gap-4">
-      <label className="flex flex-col text-xs text-ink-500">
-        Month
-        <input
-          ref={mRef} inputMode="numeric" value={value.m}
-          onChange={(e) => set("m", e.target.value, 2, dRef)}
-          className="w-16 border-b-2 border-mint-500 bg-transparent py-1.5 text-xl text-mint-800 focus:outline-none focus:border-mint-700"
-          placeholder="MM"
-        />
-      </label>
-      <span className="text-2xl text-mint-500 pb-1">/</span>
-      <label className="flex flex-col text-xs text-ink-500">
-        Day
-        <input
-          ref={dRef} inputMode="numeric" value={value.d}
-          onChange={(e) => set("d", e.target.value, 2, yRef)}
-          className="w-16 border-b-2 border-mint-500 bg-transparent py-1.5 text-xl text-mint-800 focus:outline-none focus:border-mint-700"
-          placeholder="DD"
-        />
-      </label>
-      <span className="text-2xl text-mint-500 pb-1">/</span>
-      <label className="flex flex-col text-xs text-ink-500">
-        Year
-        <input
-          ref={yRef} inputMode="numeric" value={value.y}
-          onChange={(e) => set("y", e.target.value, 4)}
-          className="w-24 border-b-2 border-mint-500 bg-transparent py-1.5 text-xl text-mint-800 focus:outline-none focus:border-mint-700"
-          placeholder="YYYY"
-        />
-      </label>
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-end gap-4">
+        <label className="flex flex-col text-xs text-ink-500">
+          Month
+          <input
+            ref={mRef} inputMode="numeric" value={value.m}
+            onChange={(e) => set("m", e.target.value, 2, dRef)}
+            className="w-16 border-b-2 border-mint-500 bg-transparent py-1.5 text-xl text-mint-800 focus:outline-none focus:border-mint-700"
+            placeholder="MM"
+          />
+        </label>
+        <span className="text-2xl text-mint-500 pb-1">/</span>
+        <label className="flex flex-col text-xs text-ink-500">
+          Day
+          <input
+            ref={dRef} inputMode="numeric" value={value.d}
+            onChange={(e) => set("d", e.target.value, 2, yRef)}
+            className="w-16 border-b-2 border-mint-500 bg-transparent py-1.5 text-xl text-mint-800 focus:outline-none focus:border-mint-700"
+            placeholder="DD"
+          />
+        </label>
+        <span className="text-2xl text-mint-500 pb-1">/</span>
+        <label className="flex flex-col text-xs text-ink-500">
+          Year
+          <input
+            ref={yRef} inputMode="numeric" value={value.y}
+            onChange={(e) => set("y", e.target.value, 4)}
+            className="w-24 border-b-2 border-mint-500 bg-transparent py-1.5 text-xl text-mint-800 focus:outline-none focus:border-mint-700"
+            placeholder="YYYY"
+          />
+        </label>
+      </div>
+      {errorMsg && (
+        <p className="text-sm text-red-600" role="alert">{errorMsg}</p>
+      )}
     </div>
   );
 }
