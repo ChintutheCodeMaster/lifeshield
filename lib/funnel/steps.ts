@@ -202,24 +202,24 @@ export const steps: Step[] = [
       { key: "first_name", label: "First name", type: "text", placeholder: "First name" },
       { key: "last_name",  label: "Last name",  type: "text", placeholder: "Last name"  },
     ],
-    next: "/quote/phone",
+    next: "/quote/contact",
   },
   {
-    id: "phone",
-    path: "phone",
-    title: "What is your phone number?",
-    field: "phone",
-    type: "phone",
-    next: "/quote/email",
-  },
-  {
-    id: "email",
-    path: "email",
-    title: "What is your email address?",
-    field: "email",
-    type: "email",
+    id: "contact",
+    path: "contact",
+    title: "How can we reach you?",
+    subtitle: "A licensed agent will follow up to confirm your quote.",
+    type: "group",
+    fields: [
+      { key: "phone", label: "Phone number", type: "phone" },
+      { key: "email", label: "Email address", type: "email" },
+    ],
     next: "/quote/complete",
   },
+  /* Clubbed into "contact" group above (2026-09-02). Same DB field keys.
+   * { id: "phone", path: "phone", title: "What is your phone number?", field: "phone", type: "phone", next: "/quote/email" },
+   * { id: "email", path: "email", title: "What is your email address?", field: "email", type: "email", next: "/quote/complete" },
+   */
   /* ----------------------------------------------------------------
    * REMOVED FROM ACTIVE FUNNEL (kept for reference — do not re-add
    * without product sign-off). Motivation was renamed to
