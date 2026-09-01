@@ -39,6 +39,24 @@ function isDobValue(v: unknown): v is DobValue {
   return !!v && typeof v === "object" && "m" in v && "d" in v && "y" in v;
 }
 
+// Applicant must be at least 18 and no older than 100.
+const MIN_AGE = 18;
+const MAX_AGE = 100;
+
+function isDobPlausible(m: number, d: number, y: number): boolean {
+  if (!(m >= 1 && m <= 12 && d >= 1 && d <= 31)) return false;
+  const now = new Date();
+  const dob = new Date(y, m - 1, d);
+  if (dob.getFullYear() !== y || dob.getMonth() !== m - 1 || dob.getDate() !== d) {
+    return false; // rejects things like Feb 30
+  }
+  let age = now.getFullYear() - y;
+  const beforeBirthday =
+    now.getMonth() < m - 1 || (now.getMonth() === m - 1 && now.getDate() < d);
+  if (beforeBirthday) age -= 1;
+  return age >= MIN_AGE && age <= MAX_AGE;
+}
+
 function fieldValid(field: GroupField, value: unknown): boolean {
   if (value == null) return false;
   switch (field.type) {
@@ -53,8 +71,7 @@ function fieldValid(field: GroupField, value: unknown): boolean {
       return typeof value === "boolean";
     case "dob": {
       if (!isDobValue(value)) return false;
-      const m = +value.m, d = +value.d, y = +value.y;
-      return m >= 1 && m <= 12 && d >= 1 && d <= 31 && y >= 1900 && y <= new Date().getFullYear();
+      return isDobPlausible(+value.m, +value.d, +value.y);
     }
   }
 }
@@ -120,8 +137,7 @@ export function StepForm({ step }: Props) {
       case "phone": return text.replace(/\D/g, "").length >= 10;
       case "email": return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(text.trim());
       case "dob": {
-        const m = +dob.m, d = +dob.d, y = +dob.y;
-        return m >= 1 && m <= 12 && d >= 1 && d <= 31 && y >= 1900 && y <= new Date().getFullYear();
+        return isDobPlausible(+dob.m, +dob.d, +dob.y);
       }
       case "interstitial": return true;
       case "group":
@@ -155,12 +171,25 @@ export function StepForm({ step }: Props) {
     }
   }
 
+  // Enter should progress the form even when focus is on a custom option button
+  // (tiles / stacked buttons) or a native <select>, where the browser wouldn't
+  // otherwise fire form submit.
+  function onFormKeyDown(e: React.KeyboardEvent<HTMLFormElement>) {
+    if (e.key !== "Enter" || e.shiftKey) return;
+    const t = e.target as HTMLElement;
+    if (t.tagName === "TEXTAREA") return; // preserve newlines in textareas
+    if (t.tagName === "BUTTON") return;   // buttons already handle Enter themselves
+    if (!canSubmit || pending) return;
+    e.preventDefault();
+    onFormSubmit(e);
+  }
+
   function updateGroup(key: string, value: GroupValue) {
     setGroup((prev) => ({ ...prev, [key]: value }));
   }
 
   return (
-    <form onSubmit={onFormSubmit} className="space-y-2">
+    <form onSubmit={onFormSubmit} onKeyDown={onFormKeyDown} className="space-y-2">
       {step.type === "multi-tiles" && (
         <TilesGrid options={step.options ?? []} value={multi} onChange={setMulti} multi />
       )}

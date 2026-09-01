@@ -139,7 +139,7 @@ export const steps: Step[] = [
     type: "group",
     fields: [
       { key: "dob",          label: "Date of birth",      type: "dob" },
-      { key: "sex_at_birth", label: "Sex assigned at birth", type: "select", options: SEX_OPTIONS },
+      { key: "sex_at_birth", label: "Gender at birth",    type: "select", options: SEX_OPTIONS },
       { key: "state",        label: "State of residence", type: "select", options: STATE_OPTIONS },
     ],
     next: "/quote/health-lifestyle",
