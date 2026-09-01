@@ -112,23 +112,25 @@ export const steps: Step[] = [
       { key: "coverage_amount", label: "Coverage amount", type: "select", options: COVERAGE_OPTIONS },
       { key: "term_length",     label: "Term length",     type: "select", options: TERM_OPTIONS },
     ],
-    next: "/quote/children",
-  },
-  {
-    id: "children",
-    path: "children",
-    title: "How many children do you have under 18?",
-    field: "children_count",
-    type: "single-buttons",
-    options: [
-      { value: "0", label: "0" },
-      { value: "1", label: "1" },
-      { value: "2", label: "2" },
-      { value: "3", label: "3" },
-      { value: "4", label: "4+" },
-    ],
     next: "/quote/about-you",
   },
+  /* Removed 2026-09-02 — redundant given `who_to_protect` already captures "children" as an option.
+   * {
+   *   id: "children",
+   *   path: "children",
+   *   title: "How many children do you have under 18?",
+   *   field: "children_count",
+   *   type: "single-buttons",
+   *   options: [
+   *     { value: "0", label: "0" },
+   *     { value: "1", label: "1" },
+   *     { value: "2", label: "2" },
+   *     { value: "3", label: "3" },
+   *     { value: "4", label: "4+" },
+   *   ],
+   *   next: "/quote/about-you",
+   * },
+   */
   {
     id: "about-you",
     path: "about-you",
