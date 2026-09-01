@@ -130,23 +130,8 @@ export function StepForm({ step }: Props) {
     }
   }, [step.type, step.fields, multi, single, text, dob, group]);
 
-  const autoAdvance = useMemo(() => {
-    switch (step.type) {
-      case "single-buttons":
-      case "select":
-      case "dob":
-        return true;
-      case "group":
-        // Any text-entry field in the group means user is typing — keep the OK button
-        return !(step.fields ?? []).some(
-          (f) => f.type === "text" || f.type === "phone" || f.type === "email",
-        );
-      default:
-        return false; // multi-tiles, text, phone, email, interstitial
-    }
-  }, [step.type, step.fields]);
-
-  function performSubmit() {
+  function onFormSubmit(e: React.FormEvent) {
+    e.preventDefault();
     if (!canSubmit || pending) return;
     switch (step.type) {
       case "multi-tiles": return submit(multi);
@@ -168,21 +153,6 @@ export function StepForm({ step }: Props) {
         return submitPatch(patch);
       }
     }
-  }
-
-  // Auto-advance: fire the same submit path as clicking OK, once everything's valid.
-  // Ref keeps the callback fresh so the effect can depend only on the boolean triggers.
-  const submitRef = useRef(performSubmit);
-  submitRef.current = performSubmit;
-  useEffect(() => {
-    if (!autoAdvance || !canSubmit || pending) return;
-    const t = setTimeout(() => submitRef.current(), 180);
-    return () => clearTimeout(t);
-  }, [autoAdvance, canSubmit, pending]);
-
-  function onFormSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    performSubmit();
   }
 
   function updateGroup(key: string, value: GroupValue) {
@@ -217,13 +187,11 @@ export function StepForm({ step }: Props) {
 
       {error && <p className="text-red-600 text-sm">{error}</p>}
 
-      {!autoAdvance && (
-        <OkButton
-          label={step.type === "interstitial" ? "Continue" : "OK"}
-          disabled={!canSubmit && !step.optional}
-          loading={pending}
-        />
-      )}
+      <OkButton
+        label={step.type === "interstitial" ? "Continue" : "OK"}
+        disabled={!canSubmit && !step.optional}
+        loading={pending}
+      />
       {step.optional && (
         <button
           type="button"
