@@ -36,10 +36,10 @@ export function Header() {
         <div className="mx-auto max-w-7xl px-6 h-16 md:h-20 flex items-center justify-between">
           <Link href="/" className="flex items-baseline gap-1">
             <span className="text-2xl md:text-3xl font-display font-bold tracking-tight text-mint-800">
-              Mint
+              {brand.wordmark.primary}
             </span>
             <span className="text-2xl md:text-3xl font-display font-light tracking-tight text-mint-500">
-              Life
+              {brand.wordmark.secondary}
             </span>
           </Link>
           <nav className="hidden md:flex items-center gap-8">

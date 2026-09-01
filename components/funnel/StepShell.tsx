@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ProgressBar } from "./ProgressBar";
 import { ArrowLeft } from "lucide-react";
+import { brand } from "@/lib/brand";
 
 export function StepShell({
   progress,
@@ -20,8 +21,8 @@ export function StepShell({
       <header className="px-6 md:px-10 pt-6 pb-4">
         <div className="flex items-center gap-4 md:gap-8">
           <Link href="/" className="flex items-baseline gap-1 shrink-0">
-            <span className="text-2xl font-display font-bold text-mint-800">Mint</span>
-            <span className="text-2xl font-display font-light text-mint-500">Life</span>
+            <span className="text-2xl font-display font-bold text-mint-800">{brand.wordmark.primary}</span>
+            <span className="text-2xl font-display font-light text-mint-500">{brand.wordmark.secondary}</span>
           </Link>
           <ProgressBar value={progress} className="flex-1 max-w-xl mx-auto" />
           <div className="hidden sm:block text-xs font-medium text-ink-500 shrink-0 tabular-nums">

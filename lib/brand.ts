@@ -1,9 +1,10 @@
 export const brand = {
-  name: "MintLife",
+  name: "CoverageQualifier",
+  wordmark: { primary: "Coverage", secondary: "Qualifier" },
   tagline: "Life insurance made simple",
   phone: "(866) 912-7775",
   phoneHref: "tel:+18669127775",
-  email: "hello@mintlife.example.com",
+  email: "hello@coveragequalifier.example.com",
   address: "123 Evergreen Ave, Suite 400, Austin, TX 78701",
   socials: {
     linkedin: "https://linkedin.com",

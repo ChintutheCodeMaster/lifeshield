@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { brand } from "@/lib/brand";
 
 export function ShellF2({ children }: { children: React.ReactNode }) {
   return (
@@ -11,8 +12,8 @@ export function ShellF2({ children }: { children: React.ReactNode }) {
       <header className="relative bg-white/70 backdrop-blur border-b border-mint-100">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-baseline gap-1">
-            <span className="text-xl font-display font-bold text-mint-800">Mint</span>
-            <span className="text-xl font-display font-light text-mint-500">Life</span>
+            <span className="text-xl font-display font-bold text-mint-800">{brand.wordmark.primary}</span>
+            <span className="text-xl font-display font-light text-mint-500">{brand.wordmark.secondary}</span>
           </Link>
           <a
             href="tel:+18669127775"

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { brand } from "@/lib/brand";
 
 export function Hero() {
   return (
@@ -15,7 +16,7 @@ export function Hero() {
               Affordable life insurance for everyday families.
             </h1>
             <p className="mt-5 text-lg md:text-xl text-mint-50/90 leading-relaxed max-w-lg">
-              Life insurance is easy, fast, and affordable with MintLife. Get
+              Life insurance is easy, fast, and affordable with {brand.name}. Get
               your quote and buy term life online — no medical exam required in
               most cases.
             </p>

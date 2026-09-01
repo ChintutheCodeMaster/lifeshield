@@ -10,6 +10,9 @@ export type LeadRow = {
   sex_at_birth: string | null;
   tobacco: string | null;
   health_level: string | null;
+  tobacco_last_12mo: boolean | null;
+  married: boolean | null;
+  medical_treatment_5yr: boolean | null;
   term_length: number | null;
   coverage_amount: number | null;
   first_name: string | null;

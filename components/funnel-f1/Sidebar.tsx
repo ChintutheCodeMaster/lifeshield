@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { groupsF1 } from "@/lib/funnel-mock/groups-f1";
 import { cn } from "@/lib/utils";
+import { brand } from "@/lib/brand";
 
 export function SidebarF1({ activeSlug }: { activeSlug: string }) {
   const items = [
@@ -13,8 +14,8 @@ export function SidebarF1({ activeSlug }: { activeSlug: string }) {
   return (
     <aside className="hidden md:flex flex-col gap-0 shrink-0 w-40 pt-6 pl-2">
       <Link href="/" className="mb-10 flex items-baseline gap-1">
-        <span className="text-2xl font-display font-bold text-mint-800">Mint</span>
-        <span className="text-2xl font-display font-light text-mint-500">Life</span>
+        <span className="text-2xl font-display font-bold text-mint-800">{brand.wordmark.primary}</span>
+        <span className="text-2xl font-display font-light text-mint-500">{brand.wordmark.secondary}</span>
       </Link>
       <ol className="relative flex flex-col gap-6">
         {items.map((item, i) => {

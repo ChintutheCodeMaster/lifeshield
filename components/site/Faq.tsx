@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { brand } from "@/lib/brand";
 
 const faqs = [
   {
@@ -19,10 +20,10 @@ const faqs = [
   },
   {
     q: "Can I buy life insurance as a senior?",
-    a: "Yes. MintLife offers coverage for applicants up to age 75. Premiums are higher at older ages, but affordable options are still available, particularly for shorter terms.",
+    a: `Yes. ${brand.name} offers coverage for applicants up to age 75. Premiums are higher at older ages, but affordable options are still available, particularly for shorter terms.`,
   },
   {
-    q: "Why should I choose MintLife?",
+    q: `Why should I choose ${brand.name}?`,
     a: "We combine transparent pricing, a fast online application (no medical exam in most cases), and licensed agents who work for you — not on commission-driven sales scripts.",
   },
   {

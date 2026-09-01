@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServer } from "@/lib/supabase/server";
 import { createAdmin } from "@/lib/supabase/admin";
+import { brand } from "@/lib/brand";
 
 export const runtime = "nodejs";
 
@@ -8,6 +9,7 @@ const COLUMNS = [
   "id","session_id","created_at","updated_at","is_complete","consent_at",
   "first_name","last_name","email","phone",
   "state","dob","sex_at_birth","tobacco","health_level",
+  "tobacco_last_12mo","married","medical_treatment_5yr",
   "term_length","coverage_amount",
   "motivation","quotes_for","who_to_protect","children_count",
 ] as const;
@@ -48,7 +50,7 @@ export async function GET() {
     status: 200,
     headers: {
       "content-type": "text/csv; charset=utf-8",
-      "content-disposition": `attachment; filename="mintlife-leads-${new Date().toISOString().slice(0,10)}.csv"`,
+      "content-disposition": `attachment; filename="${brand.name.toLowerCase()}-leads-${new Date().toISOString().slice(0,10)}.csv"`,
     },
   });
 }

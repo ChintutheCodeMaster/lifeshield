@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { brand } from "@/lib/brand";
 
 const tiers = [
   {
@@ -33,7 +34,7 @@ export function PricingTiles() {
           A plan for every stage of life
         </h2>
         <p className="mt-4 text-lg text-ink-500">
-          MintLife offers a range of policies and coverage terms at a low
+          {brand.name} offers a range of policies and coverage terms at a low
           monthly premium. Rates below are for a 30-year-old in good health.
         </p>
       </div>

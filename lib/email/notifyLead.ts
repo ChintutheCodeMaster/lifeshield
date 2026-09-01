@@ -13,6 +13,9 @@ type LeadRow = {
   sex_at_birth?: string | null;
   tobacco?: string | null;
   health_level?: string | null;
+  tobacco_last_12mo?: boolean | null;
+  married?: boolean | null;
+  medical_treatment_5yr?: boolean | null;
   term_length?: number | null;
   coverage_amount?: number | null;
   motivation?: string[] | null;
@@ -33,6 +36,7 @@ export async function notifyLead(lead: LeadRow) {
 
   const resend = new Resend(apiKey);
   const name = [lead.first_name, lead.last_name].filter(Boolean).join(" ") || "New lead";
+  const yn = (v: boolean | null | undefined) => (v == null ? null : v ? "Yes" : "No");
   const rows: [string, string | number | null | undefined][] = [
     ["Name", name],
     ["Email", lead.email],
@@ -40,8 +44,9 @@ export async function notifyLead(lead: LeadRow) {
     ["State", lead.state],
     ["DOB", lead.dob],
     ["Sex at birth", lead.sex_at_birth],
-    ["Tobacco", lead.tobacco],
-    ["Health", lead.health_level],
+    ["Tobacco (last 12mo)", yn(lead.tobacco_last_12mo)],
+    ["Married", yn(lead.married)],
+    ["Medical treatment (5yr)", yn(lead.medical_treatment_5yr)],
     ["Term (years)", lead.term_length],
     ["Coverage", lead.coverage_amount ? `$${Number(lead.coverage_amount).toLocaleString()}` : null],
     ["Motivation", lead.motivation?.join(", ")],

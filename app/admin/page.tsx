@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createServer } from "@/lib/supabase/server";
 import { createAdmin } from "@/lib/supabase/admin";
+import { brand } from "@/lib/brand";
 import { SignOutButton } from "./SignOutButton";
 
 async function requireAdmin() {
@@ -47,8 +48,8 @@ export default async function AdminHome({
       <header className="border-b border-ink-300/30 bg-white">
         <div className="mx-auto max-w-7xl px-6 h-16 flex items-center justify-between">
           <Link href="/admin" className="flex items-baseline gap-1">
-            <span className="text-xl font-display font-bold text-mint-800">Mint</span>
-            <span className="text-xl font-display font-light text-mint-500">Life</span>
+            <span className="text-xl font-display font-bold text-mint-800">{brand.wordmark.primary}</span>
+            <span className="text-xl font-display font-light text-mint-500">{brand.wordmark.secondary}</span>
             <span className="ml-2 text-xs font-semibold uppercase tracking-widest text-ink-500">Admin</span>
           </Link>
           <div className="flex items-center gap-3">

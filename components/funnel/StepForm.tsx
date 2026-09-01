@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import type { Step, Option } from "@/lib/funnel/steps";
+import type { Step, Option, GroupField } from "@/lib/funnel/steps";
 import { OkButton } from "./OkButton";
 import { cn } from "@/lib/utils";
 import {
@@ -31,6 +31,46 @@ const ICONS = {
 
 type Props = { step: Step };
 
+type DobValue = { m: string; d: string; y: string };
+type GroupValue = string | DobValue | boolean | undefined;
+type GroupState = Record<string, GroupValue>;
+
+function isDobValue(v: unknown): v is DobValue {
+  return !!v && typeof v === "object" && "m" in v && "d" in v && "y" in v;
+}
+
+function fieldValid(field: GroupField, value: unknown): boolean {
+  if (value == null) return false;
+  switch (field.type) {
+    case "select":
+    case "text":
+      return typeof value === "string" && value.trim().length > 0;
+    case "phone":
+      return typeof value === "string" && value.replace(/\D/g, "").length >= 10;
+    case "email":
+      return typeof value === "string" && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value.trim());
+    case "yesno":
+      return typeof value === "boolean";
+    case "dob": {
+      if (!isDobValue(value)) return false;
+      const m = +value.m, d = +value.d, y = +value.y;
+      return m >= 1 && m <= 12 && d >= 1 && d <= 31 && y >= 1900 && y <= new Date().getFullYear();
+    }
+  }
+}
+
+function serializeGroupField(field: GroupField, value: unknown): unknown {
+  if (field.type === "dob" && isDobValue(value)) {
+    return `${value.y.padStart(4, "0")}-${value.m.padStart(2, "0")}-${value.d.padStart(2, "0")}`;
+  }
+  if (field.type === "phone" && typeof value === "string") {
+    return value.replace(/\D/g, "");
+  }
+  if (field.type === "yesno") return value; // already boolean
+  if (typeof value === "string") return value.trim();
+  return value;
+}
+
 export function StepForm({ step }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -40,21 +80,17 @@ export function StepForm({ step }: Props) {
   const [multi, setMulti] = useState<string[]>([]);
   const [single, setSingle] = useState<string>("");
   const [text, setText] = useState<string>("");
-  const [dob, setDob] = useState({ m: "", d: "", y: "" });
+  const [dob, setDob] = useState<DobValue>({ m: "", d: "", y: "" });
+  const [group, setGroup] = useState<GroupState>({});
 
-  async function submit(value: unknown) {
-    if (!step.field) {
-      router.push(step.next);
-      return;
-    }
+  async function submitPatch(patch: Record<string, unknown>) {
     setError(null);
-    const body = { patch: { [step.field]: value } };
     startTransition(async () => {
       try {
         const res = await fetch("/api/leads", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify(body),
+          body: JSON.stringify({ patch }),
         });
         if (!res.ok) {
           const j = await res.json().catch(() => ({}));
@@ -65,6 +101,14 @@ export function StepForm({ step }: Props) {
         setError(e instanceof Error ? e.message : "Something went wrong");
       }
     });
+  }
+
+  async function submit(value: unknown) {
+    if (!step.field) {
+      router.push(step.next);
+      return;
+    }
+    await submitPatch({ [step.field]: value });
   }
 
   const canSubmit = useMemo(() => {
@@ -80,12 +124,29 @@ export function StepForm({ step }: Props) {
         return m >= 1 && m <= 12 && d >= 1 && d <= 31 && y >= 1900 && y <= new Date().getFullYear();
       }
       case "interstitial": return true;
+      case "group":
+        return (step.fields ?? []).every((f) => fieldValid(f, group[f.key]));
       default: return false;
     }
-  }, [step.type, multi, single, text, dob]);
+  }, [step.type, step.fields, multi, single, text, dob, group]);
 
-  function onFormSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  const autoAdvance = useMemo(() => {
+    switch (step.type) {
+      case "single-buttons":
+      case "select":
+      case "dob":
+        return true;
+      case "group":
+        // Any text-entry field in the group means user is typing — keep the OK button
+        return !(step.fields ?? []).some(
+          (f) => f.type === "text" || f.type === "phone" || f.type === "email",
+        );
+      default:
+        return false; // multi-tiles, text, phone, email, interstitial
+    }
+  }, [step.type, step.fields]);
+
+  function performSubmit() {
     if (!canSubmit || pending) return;
     switch (step.type) {
       case "multi-tiles": return submit(multi);
@@ -99,7 +160,33 @@ export function StepForm({ step }: Props) {
         return submit(iso);
       }
       case "interstitial": return submit(null);
+      case "group": {
+        const patch: Record<string, unknown> = {};
+        for (const f of step.fields ?? []) {
+          patch[f.key] = serializeGroupField(f, group[f.key]);
+        }
+        return submitPatch(patch);
+      }
     }
+  }
+
+  // Auto-advance: fire the same submit path as clicking OK, once everything's valid.
+  // Ref keeps the callback fresh so the effect can depend only on the boolean triggers.
+  const submitRef = useRef(performSubmit);
+  submitRef.current = performSubmit;
+  useEffect(() => {
+    if (!autoAdvance || !canSubmit || pending) return;
+    const t = setTimeout(() => submitRef.current(), 180);
+    return () => clearTimeout(t);
+  }, [autoAdvance, canSubmit, pending]);
+
+  function onFormSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    performSubmit();
+  }
+
+  function updateGroup(key: string, value: GroupValue) {
+    setGroup((prev) => ({ ...prev, [key]: value }));
   }
 
   return (
@@ -124,14 +211,19 @@ export function StepForm({ step }: Props) {
       {step.type === "interstitial" && (
         <p className="text-ink-500 text-sm">Click Continue to keep going.</p>
       )}
+      {step.type === "group" && (
+        <GroupFields fields={step.fields ?? []} value={group} onChange={updateGroup} />
+      )}
 
       {error && <p className="text-red-600 text-sm">{error}</p>}
 
-      <OkButton
-        label={step.type === "interstitial" ? "Continue" : "OK"}
-        disabled={!canSubmit && !step.optional}
-        loading={pending}
-      />
+      {!autoAdvance && (
+        <OkButton
+          label={step.type === "interstitial" ? "Continue" : "OK"}
+          disabled={!canSubmit && !step.optional}
+          loading={pending}
+        />
+      )}
       {step.optional && (
         <button
           type="button"
@@ -277,14 +369,16 @@ function TextField({
   onChange,
   placeholder,
   inputType = "text",
+  autoFocus = true,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   inputType?: "text" | "email";
+  autoFocus?: boolean;
 }) {
   const ref = useRef<HTMLInputElement>(null);
-  useEffect(() => { ref.current?.focus(); }, []);
+  useEffect(() => { if (autoFocus) ref.current?.focus(); }, [autoFocus]);
   return (
     <input
       ref={ref}
@@ -324,14 +418,16 @@ function PhoneField({ value, onChange }: { value: string; onChange: (v: string) 
 function DobField({
   value,
   onChange,
+  autoFocus = true,
 }: {
-  value: { m: string; d: string; y: string };
-  onChange: (v: { m: string; d: string; y: string }) => void;
+  value: DobValue;
+  onChange: (v: DobValue) => void;
+  autoFocus?: boolean;
 }) {
   const mRef = useRef<HTMLInputElement>(null);
   const dRef = useRef<HTMLInputElement>(null);
   const yRef = useRef<HTMLInputElement>(null);
-  useEffect(() => { mRef.current?.focus(); }, []);
+  useEffect(() => { if (autoFocus) mRef.current?.focus(); }, [autoFocus]);
 
   function set(key: "m" | "d" | "y", v: string, max: number, next?: React.RefObject<HTMLInputElement | null>) {
     const digits = v.replace(/\D/g, "").slice(0, max);
@@ -370,6 +466,108 @@ function DobField({
           placeholder="YYYY"
         />
       </label>
+    </div>
+  );
+}
+
+function GroupFields({
+  fields,
+  value,
+  onChange,
+}: {
+  fields: GroupField[];
+  value: GroupState;
+  onChange: (key: string, v: GroupValue) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-5 md:gap-6">
+      {fields.map((f, idx) => {
+        const v = value[f.key];
+        return (
+          <div key={f.key} className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-ink-500 uppercase tracking-wide">
+              {f.label}
+            </label>
+            {f.type === "select" && (
+              <SelectField
+                options={f.options ?? []}
+                value={typeof v === "string" ? v : ""}
+                onChange={(nv) => onChange(f.key, nv)}
+              />
+            )}
+            {f.type === "text" && (
+              <TextField
+                value={typeof v === "string" ? v : ""}
+                onChange={(nv) => onChange(f.key, nv)}
+                placeholder={f.placeholder}
+                autoFocus={idx === 0}
+              />
+            )}
+            {f.type === "email" && (
+              <TextField
+                value={typeof v === "string" ? v : ""}
+                onChange={(nv) => onChange(f.key, nv)}
+                placeholder={f.placeholder ?? "you@example.com"}
+                inputType="email"
+                autoFocus={idx === 0}
+              />
+            )}
+            {f.type === "phone" && (
+              <PhoneField
+                value={typeof v === "string" ? v : ""}
+                onChange={(nv) => onChange(f.key, nv)}
+              />
+            )}
+            {f.type === "dob" && (
+              <DobField
+                value={isDobValue(v) ? v : { m: "", d: "", y: "" }}
+                onChange={(nv) => onChange(f.key, nv)}
+                autoFocus={idx === 0}
+              />
+            )}
+            {f.type === "yesno" && (
+              <YesNoField
+                value={typeof v === "boolean" ? v : undefined}
+                onChange={(nv) => onChange(f.key, nv)}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function YesNoField({
+  value,
+  onChange,
+}: {
+  value: boolean | undefined;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <div className="flex gap-2 max-w-md">
+      {[
+        { label: "Yes", val: true },
+        { label: "No", val: false },
+      ].map((o) => {
+        const selected = value === o.val;
+        return (
+          <button
+            key={o.label}
+            type="button"
+            onClick={() => onChange(o.val)}
+            className={cn(
+              "flex-1 rounded-lg px-4 py-3 border font-medium transition-all",
+              selected
+                ? "bg-mint-100 border-mint-500 text-mint-800"
+                : "bg-mint-50/60 border-transparent text-ink-700 hover:bg-mint-100/60",
+            )}
+          >
+            {o.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

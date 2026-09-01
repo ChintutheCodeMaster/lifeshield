@@ -52,8 +52,8 @@ export function Footer() {
         <div className="grid md:grid-cols-[2fr_3fr] gap-10 pb-10 border-b border-white/10">
           <div>
             <div className="flex items-baseline gap-1 mb-3">
-              <span className="text-3xl font-display font-bold text-white">Mint</span>
-              <span className="text-3xl font-display font-light text-mint-400">Life</span>
+              <span className="text-3xl font-display font-bold text-white">{brand.wordmark.primary}</span>
+              <span className="text-3xl font-display font-light text-mint-400">{brand.wordmark.secondary}</span>
             </div>
             <p className="text-sm text-mint-100/70 max-w-md">
               Get your quote in minutes.

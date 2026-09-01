@@ -1,4 +1,5 @@
 import { Award } from "lucide-react";
+import { brand } from "@/lib/brand";
 
 export function FeaturedInsight() {
   return (
@@ -9,7 +10,7 @@ export function FeaturedInsight() {
             Featured Insight
           </div>
           <h3 className="font-display text-2xl md:text-3xl font-bold text-mint-900 leading-tight max-w-xl">
-            MintLife Named One of America&apos;s Best Insurance Companies for 2026
+            {brand.name} Named One of America&apos;s Best Insurance Companies for 2026
           </h3>
           <p className="mt-3 text-ink-500 max-w-lg">
             Recognized for affordability, transparency, and customer satisfaction

@@ -1,6 +1,6 @@
-# MintLife — Life Insurance Offer Funnel
+# CoverageQualifier — Life Insurance Offer Funnel
 
-Marketing site + multi-step quote funnel built with Next.js 16, Tailwind v4, and Supabase. Placeholder brand `MintLife` — swap via `lib/brand.ts`.
+Marketing site + multi-step quote funnel built with Next.js 16, Tailwind v4, and Supabase. Brand string `CoverageQualifier` — swap via `lib/brand.ts`.
 
 ## Stack
 

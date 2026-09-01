@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { brand } from "@/lib/brand";
 
 const quotes = [
   {
@@ -23,12 +24,12 @@ const quotes = [
   {
     name: "Marcus",
     role: "Policyholder since 2021",
-    text: "Buying life insurance always felt intimidating. MintLife made it feel like just another Sunday errand. Peace of mind, sorted.",
+    text: `Buying life insurance always felt intimidating. ${brand.name} made it feel like just another Sunday errand. Peace of mind, sorted.`,
   },
   {
     name: "Elena",
     role: "Policyholder since 2025",
-    text: "As a small business owner, I needed something flexible. MintLife's 20-year term is protecting both my family and my company. Couldn't be happier.",
+    text: `As a small business owner, I needed something flexible. ${brand.name}'s 20-year term is protecting both my family and my company. Couldn't be happier.`,
   },
 ];
 

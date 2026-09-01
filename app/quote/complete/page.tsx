@@ -1,5 +1,6 @@
 import { StepShell } from "@/components/funnel/StepShell";
 import { steps } from "@/lib/funnel/steps";
+import { brand } from "@/lib/brand";
 import { ConsentForm } from "./ConsentForm";
 
 export default function CompletePage() {
@@ -13,14 +14,14 @@ export default function CompletePage() {
         </h2>
         <p className="mt-6 text-sm text-ink-500 leading-relaxed">
           By clicking on <strong>Display Quotes</strong>, you agree to
-          MintLife&apos;s{" "}
+          {" "}{brand.name}&apos;s{" "}
           <a href="#" className="underline text-mint-700">privacy policy</a>{" "}
-          and provide your express written consent for MintLife to contact you
+          and provide your express written consent for {brand.name} to contact you
           at the number(s) and email you entered on this webpage (which may
           involve the use of an automatic dialing system, artificial or
           prerecorded voice, or text message) to market our products and
           services. This consent is not required to get a quote or buy anything
-          from MintLife, and you may instead reach us at (866) 912-7775.
+          from {brand.name}, and you may instead reach us at {brand.phone}.
         </p>
         <ConsentForm />
       </div>
